@@ -397,55 +397,55 @@ export default function Page() {
     }
   };
 
-  /** 追加：現在のテンプレだけ初期化（タイトルは残す） */
-const resetCurrentTemplate = () => {
-  if (!activeTemplate) return;
+  /** 3種の初期化（分ける） */
 
-  const ok = confirm(`現在のテンプレ「${activeTemplate.title}」を初期化しますか？\n（本文・テンプレ変数が初期状態に戻ります）`);
-  if (!ok) return;
+  // 現在のテンプレだけ初期化（タイトルは残す）
+  const resetCurrentTemplate = () => {
+    if (!activeTemplate) return;
 
-  // 署名キーはテンプレ側に持たないようにする
-  const baseVars: Vars = { ...DEFAULT_TEMPLATE_VARS };
-  for (const k of profileKeys) delete baseVars[k];
+    const ok = confirm(`現在のテンプレ「${activeTemplate.title}」を初期化しますか？\n（本文・テンプレ変数が初期状態に戻ります）`);
+    if (!ok) return;
 
-  setTemplates((prev) =>
-    prev.map((t) =>
-      t.id === activeTemplate.id
-        ? {
-            ...t,
-            body: DEFAULT_TEMPLATE_BODY,
-            vars: baseVars,
-          }
-        : t
-    )
-  );
-};
+    // 署名キーはテンプレ側に持たないようにする
+    const baseVars: Vars = { ...DEFAULT_TEMPLATE_VARS };
+    for (const k of profileKeys) delete baseVars[k];
 
-/** 追加：現在の署名セットだけ初期化（タイトルは残す） */
-const resetCurrentProfile = () => {
-  if (!activeProfile) return;
+    setTemplates((prev) =>
+      prev.map((t) =>
+        t.id === activeTemplate.id
+          ? {
+              ...t,
+              body: DEFAULT_TEMPLATE_BODY,
+              vars: baseVars,
+            }
+          : t
+      )
+    );
+  };
 
-  const ok = confirm(`現在の署名セット「${activeProfile.title}」を初期化しますか？\n（署名変数の値が空になります）`);
-  if (!ok) return;
+  // 現在の署名セットだけ初期化（タイトルは残す）
+  const resetCurrentProfile = () => {
+    if (!activeProfile) return;
 
-  // 署名として扱うキー（profileKeys）だけ空文字で作り直す
-  const nextVars: Vars = {};
-  for (const k of profileKeys) nextVars[k] = "";
+    const ok = confirm(`現在の署名セット「${activeProfile.title}」を初期化しますか？\n（署名変数の値が空になります）`);
+    if (!ok) return;
 
-  setProfiles((prev) =>
-    prev.map((p) =>
-      p.id === activeProfile.id
-        ? {
-            ...p,
-            vars: nextVars,
-          }
-        : p
-    )
-  );
-};
+    const nextVars: Vars = {};
+    for (const k of profileKeys) nextVars[k] = "";
 
+    setProfiles((prev) =>
+      prev.map((p) =>
+        p.id === activeProfile.id
+          ? {
+              ...p,
+              vars: nextVars,
+            }
+          : p
+      )
+    );
+  };
 
-  /** 追加：全部初期化 */
+  // 全部初期化（保存データも含めて）
   const resetAll = () => {
     const ok = confirm("すべて初期化しますか？（テンプレ/署名セット/変数/保存データが初期状態に戻ります）");
     if (!ok) return;
@@ -494,9 +494,7 @@ const resetCurrentProfile = () => {
     if (!activeTemplate) return;
     const title = prompt("テンプレ名を変更", activeTemplate.title);
     if (!title) return;
-    setTemplates((prev) =>
-      prev.map((t) => (t.id === activeTemplate.id ? { ...t, title: title.trim() || t.title } : t))
-    );
+    setTemplates((prev) => prev.map((t) => (t.id === activeTemplate.id ? { ...t, title: title.trim() || t.title } : t)));
   };
 
   const deleteTemplate = () => {
@@ -530,9 +528,7 @@ const resetCurrentProfile = () => {
     if (!activeProfile) return;
     const title = prompt("署名セット名を変更", activeProfile.title);
     if (!title) return;
-    setProfiles((prev) =>
-      prev.map((p) => (p.id === activeProfile.id ? { ...p, title: title.trim() || p.title } : p))
-    );
+    setProfiles((prev) => prev.map((p) => (p.id === activeProfile.id ? { ...p, title: title.trim() || p.title } : p)));
   };
 
   const deleteProfile = () => {
@@ -578,38 +574,30 @@ const resetCurrentProfile = () => {
   }, [keysInBody, activeTemplate?.vars, activeProfile?.vars, profileKeys]);
 
   return (
-    <div style={{ maxWidth: 1200, margin: "24px auto", padding: 16, fontFamily: "system-ui" }}>
-      {/* タイトル + 初期化ボタン */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>連絡テンプレ集（テンプレ複数 + 署名セット）</h1>
-
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={resetCurrentTemplate} style={btnStyle} title="現在のテンプレ本文・テンプレ変数を初期化">
-          テンプレ初期化
-        </button>
-
-        <button onClick={resetCurrentProfile} style={btnStyle} title="現在の署名セットの値を初期化（空に戻す）">
-          署名初期化
-        </button>
-
-        <button onClick={resetAll} style={btnStyle} title="保存データ含めて全部初期状態に戻す">
-          全部初期化
-        </button>
+    <div className="container">
+      {/* ====== Header ====== */}
+      <div className="headerRow">
+        <h1 className="h1">連絡テンプレ集（テンプレ複数 + 署名セット）</h1>
+        <div className="headerButtons">
+          <button onClick={resetCurrentTemplate} className="btn" title="現在のテンプレ本文・テンプレ変数を初期化">
+            テンプレ初期化
+          </button>
+          <button onClick={resetCurrentProfile} className="btn" title="現在の署名セットの値を初期化（空に戻す）">
+            署名初期化
+          </button>
+          <button onClick={resetAll} className="btn" title="保存データ含めて全部初期状態に戻す">
+            全部初期化
+          </button>
+        </div>
       </div>
-    </div>
 
-
-      {/* Top controls */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+      {/* ====== Top controls ====== */}
+      <div className="topControls">
         {/* Template control */}
-        <div style={{ border: "1px solid #ddd", borderRadius: 12, padding: 12 }}>
-          <div style={{ fontWeight: 700, marginBottom: 8 }}>テンプレ</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <select
-              value={activeTemplate?.id ?? ""}
-              onChange={(e) => setActiveTemplateId(e.target.value)}
-              style={{ padding: "8px 10px", border: "1px solid #ccc", borderRadius: 10, minWidth: 260 }}
-            >
+        <div className="panel">
+          <div className="panelTitle">テンプレ</div>
+          <div className="rowWrap">
+            <select value={activeTemplate?.id ?? ""} onChange={(e) => setActiveTemplateId(e.target.value)} className="select">
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.title}
@@ -617,30 +605,26 @@ const resetCurrentProfile = () => {
               ))}
             </select>
 
-            <button onClick={createTemplate} style={btnStyle}>
+            <button onClick={createTemplate} className="btn">
               新規
             </button>
-            <button onClick={duplicateTemplate} style={btnStyle}>
+            <button onClick={duplicateTemplate} className="btn">
               複製
             </button>
-            <button onClick={renameTemplate} style={btnStyle}>
+            <button onClick={renameTemplate} className="btn">
               名前変更
             </button>
-            <button onClick={deleteTemplate} style={btnStyle}>
+            <button onClick={deleteTemplate} className="btn">
               削除
             </button>
           </div>
         </div>
 
         {/* Profile control */}
-        <div style={{ border: "1px solid #ddd", borderRadius: 12, padding: 12 }}>
-          <div style={{ fontWeight: 700, marginBottom: 8 }}>署名セット</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <select
-              value={activeProfile?.id ?? ""}
-              onChange={(e) => setActiveProfileId(e.target.value)}
-              style={{ padding: "8px 10px", border: "1px solid #ccc", borderRadius: 10, minWidth: 260 }}
-            >
+        <div className="panel">
+          <div className="panelTitle">署名セット</div>
+          <div className="rowWrap">
+            <select value={activeProfile?.id ?? ""} onChange={(e) => setActiveProfileId(e.target.value)} className="select">
               {profiles.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.title}
@@ -648,82 +632,67 @@ const resetCurrentProfile = () => {
               ))}
             </select>
 
-            <button onClick={createProfile} style={btnStyle}>
+            <button onClick={createProfile} className="btn">
               新規
             </button>
-            <button onClick={renameProfile} style={btnStyle}>
+            <button onClick={renameProfile} className="btn">
               名前変更
             </button>
-            <button onClick={deleteProfile} style={btnStyle}>
+            <button onClick={deleteProfile} className="btn">
               削除
             </button>
           </div>
-          <div style={{ marginTop: 8, fontSize: 12, color: "#555" }}>
+          <div className="helpText">
             変数の「署名」チェックONにすると、この署名セットに値が保存されます（テンプレ間で共通化）。
           </div>
         </div>
       </div>
 
-      {/* Main area */}
-      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 16 }}>
+      {/* ====== Main area ====== */}
+      <div className="mainArea">
         {/* Body */}
         <div>
-          <div style={{ fontWeight: 700, marginBottom: 8 }}>テンプレ本文</div>
+          <div className="sectionTitle">テンプレ本文</div>
           <textarea
             ref={textareaRef}
             value={activeTemplate?.body ?? ""}
             onChange={(e) => setActiveTemplateBody(e.target.value)}
             rows={18}
-            style={{ width: "100%", border: "1px solid #ccc", borderRadius: 12, padding: 12, lineHeight: 1.6 }}
+            className="textarea"
           />
-          <div style={{ marginTop: 8, fontSize: 12, color: "#555" }}>
+          <div className="helpText">
             本文に <code>{"{{変数名}}"}</code> を書くと置換されます。右の「挿入」でカーソル位置に入れられます。
           </div>
         </div>
 
         {/* Variables */}
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ fontWeight: 700 }}>変数グループ</div>
-            <button onClick={addVarToGroup} style={btnStyle}>
+          <div className="varsHeader">
+            <div className="sectionTitle" style={{ margin: 0 }}>
+              変数グループ
+            </div>
+            <button onClick={addVarToGroup} className="btn">
               変数を追加
             </button>
           </div>
 
-          <div style={{ border: "1px solid #ccc", borderRadius: 12, padding: 12, maxHeight: 440, overflow: "auto" }}>
+          <div className="varsBox">
             {allVarKeys.map((k) => {
               const isUsed = keysInBody.includes(k);
               const isSig = profileKeys.includes(k);
               const value = mergedVars[k] ?? "";
 
               return (
-                <div
-                  key={k}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr auto auto",
-                    gap: 8,
-                    marginBottom: 10,
-                    alignItems: "end",
-                  }}
-                >
-                  <div>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 4 }}>
-                      <div style={{ fontSize: 12, color: "#333" }}>
+                <div key={k} className="varRow">
+                  <div className="varMain">
+                    <div className="varMeta">
+                      <div className="varLabel">
                         <b>{k}</b>{" "}
-                        {isUsed ? (
-                          <span style={{ color: "#0a7" }}>（本文で使用中）</span>
-                        ) : (
-                          <span style={{ color: "#888" }}>（未使用）</span>
-                        )}
+                        {isUsed ? <span className="used">（本文で使用中）</span> : <span className="unused">（未使用）</span>}
                       </div>
 
-                      <label style={{ fontSize: 12, color: "#444", display: "flex", gap: 6, alignItems: "center" }}>
-                        <input
-                          type="checkbox"
-                          checked={isSig}
-                          onChange={(e) => toggleSignatureKey(k, e.target.checked)}
-                        />
+                      <label className="sigToggle">
+                        <input type="checkbox" checked={isSig} onChange={(e) => toggleSignatureKey(k, e.target.checked)} />
                         署名
                       </label>
                     </div>
@@ -732,23 +701,18 @@ const resetCurrentProfile = () => {
                       value={value}
                       onChange={(e) => updateVarValue(k, e.target.value)}
                       placeholder={`例：${k} の値`}
-                      style={{ width: "100%", border: "1px solid #ccc", borderRadius: 10, padding: "8px 10px" }}
+                      className="input"
                     />
-                    <div style={{ fontSize: 11, color: "#666", marginTop: 3 }}>
-                      保存先：
-                      {isSig ? `署名セット「${activeProfile?.title ?? ""}」` : `テンプレ「${activeTemplate?.title ?? ""}」`}
+                    <div className="saveTo">
+                      保存先：{isSig ? `署名セット「${activeProfile?.title ?? ""}」` : `テンプレ「${activeTemplate?.title ?? ""}」`}
                     </div>
                   </div>
 
-                  <button onClick={() => insertPlaceholder(k)} style={smallBtnStyle} title="本文のカーソル位置に挿入">
+                  <button onClick={() => insertPlaceholder(k)} className="smallBtn" title="本文のカーソル位置に挿入">
                     挿入
                   </button>
 
-                  <button
-                    onClick={() => deleteVar(k)}
-                    style={smallBtnStyle}
-                    title="変数を削除（必要なら本文の {{}} も削除）"
-                  >
+                  <button onClick={() => deleteVar(k)} className="smallBtn" title="変数を削除（必要なら本文の {{}} も削除）">
                     削除
                   </button>
                 </div>
@@ -758,45 +722,248 @@ const resetCurrentProfile = () => {
         </div>
       </div>
 
-      {/* Preview */}
-      <div style={{ marginTop: 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <div style={{ fontWeight: 700 }}>プレビュー（置換後）</div>
-          <button onClick={copyPreview} style={btnStyle}>
+      {/* ====== Preview ====== */}
+      <div className="previewArea">
+        <div className="previewHeader">
+          <div className="sectionTitle" style={{ margin: 0 }}>
+            プレビュー（置換後）
+          </div>
+          <button onClick={copyPreview} className="btn">
             コピー
           </button>
         </div>
 
-        <pre
-          style={{
-            whiteSpace: "pre-wrap",
-            border: "1px solid #ccc",
-            borderRadius: 12,
-            padding: 12,
-            lineHeight: 1.6,
-            background: "#fafafa",
-          }}
-        >
-          {preview}
-        </pre>
+        <pre className="previewBox">{preview}</pre>
       </div>
+
+      {/* ====== styles (スマホ対応) ====== */}
+      <style jsx>{`
+        .container {
+          max-width: 1200px;
+          margin: 24px auto;
+          padding: 16px;
+          font-family: system-ui;
+        }
+
+        .headerRow {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 12px;
+          flex-wrap: wrap;
+        }
+        .h1 {
+          font-size: 22px;
+          font-weight: 700;
+          margin: 0;
+        }
+        .headerButtons {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .topControls {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+
+        .panel {
+          border: 1px solid #ddd;
+          border-radius: 12px;
+          padding: 12px;
+        }
+        .panelTitle {
+          font-weight: 700;
+          margin-bottom: 8px;
+        }
+
+        .rowWrap {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+
+        .select {
+          padding: 8px 10px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          min-width: 260px;
+        }
+
+        .mainArea {
+          display: grid;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 16px;
+        }
+
+        .sectionTitle {
+          font-weight: 700;
+          margin-bottom: 8px;
+        }
+
+        .textarea {
+          width: 100%;
+          border: 1px solid #ccc;
+          border-radius: 12px;
+          padding: 12px;
+          line-height: 1.6;
+        }
+
+        .varsHeader {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .varsBox {
+          border: 1px solid #ccc;
+          border-radius: 12px;
+          padding: 12px;
+          max-height: 440px;
+          overflow: auto;
+        }
+
+        .varRow {
+          display: grid;
+          grid-template-columns: 1fr auto auto;
+          gap: 8px;
+          margin-bottom: 10px;
+          align-items: end;
+        }
+
+        .varMain {
+          min-width: 0;
+        }
+
+        .varMeta {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 4px;
+          flex-wrap: wrap;
+        }
+
+        .varLabel {
+          font-size: 12px;
+          color: #333;
+        }
+
+        .used {
+          color: #0a7;
+        }
+        .unused {
+          color: #888;
+        }
+
+        .sigToggle {
+          font-size: 12px;
+          color: #444;
+          display: flex;
+          gap: 6px;
+          align-items: center;
+          user-select: none;
+        }
+
+        .input {
+          width: 100%;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          padding: 8px 10px;
+        }
+
+        .saveTo {
+          font-size: 11px;
+          color: #666;
+          margin-top: 3px;
+        }
+
+        .previewArea {
+          margin-top: 16px;
+        }
+        .previewHeader {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .previewBox {
+          white-space: pre-wrap;
+          border: 1px solid #ccc;
+          border-radius: 12px;
+          padding: 12px;
+          line-height: 1.6;
+          background: #fafafa;
+        }
+
+        .helpText {
+          margin-top: 8px;
+          font-size: 12px;
+          color: #555;
+        }
+
+        .btn {
+          padding: 8px 12px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          cursor: pointer;
+          background: white;
+        }
+
+        .smallBtn {
+          height: 36px;
+          padding: 0 10px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          cursor: pointer;
+          background: white;
+          white-space: nowrap;
+        }
+
+        /* ===== スマホ最適化 ===== */
+        @media (max-width: 900px) {
+          .topControls {
+            grid-template-columns: 1fr;
+          }
+          .mainArea {
+            grid-template-columns: 1fr;
+          }
+          .select {
+            min-width: 0;
+            width: 100%;
+          }
+          .varsBox {
+            max-height: none; /* スマホは高さ制限を外す */
+          }
+        }
+
+        /* さらに小さい画面：ボタンを押しやすく */
+        @media (max-width: 480px) {
+          .headerButtons {
+            width: 100%;
+          }
+          .headerButtons > :global(button) {
+            flex: 1 1 auto;
+          }
+          .varRow {
+            grid-template-columns: 1fr;
+          }
+          .smallBtn {
+            width: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 }
-
-const btnStyle: React.CSSProperties = {
-  padding: "8px 12px",
-  border: "1px solid #ccc",
-  borderRadius: 10,
-  cursor: "pointer",
-  background: "white",
-};
-
-const smallBtnStyle: React.CSSProperties = {
-  height: 36,
-  padding: "0 10px",
-  border: "1px solid #ccc",
-  borderRadius: 10,
-  cursor: "pointer",
-  background: "white",
-};
